@@ -1,0 +1,214 @@
+{
+	"info": {
+		"name": "PAYGO T1 - Recargas y Riesgo",
+		"description": "Colección de evidencia T1 Grupo 5 (PAYGO PERÚ). Orden de ejecución = orden de capturas para pregunta1/pregunta2. Importar junto al environment PAYGO-Local.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "P1 - Sincronica (Tarjetas + Recargas via Feign)",
+			"description": "Capturas para pregunta1_apellido.docx",
+			"item": [
+				{
+					"name": "1. Crear Tarjeta",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"idTarjeta\": 1,\n  \"nomTitular\": \"Juan Perez\",\n  \"saldoAsignado\": 1000,\n  \"saldoDisponible\": 1000\n}"
+						},
+						"url": {
+							"raw": "{{tarjetas_base_url}}/tarjetas",
+							"host": ["{{tarjetas_base_url}}"],
+							"path": ["tarjetas"]
+						},
+						"description": "Esperado 200. Captura 1 de pregunta1."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": ["pm.test(\"Crear tarjeta -> 200\", function () {", "    pm.response.to.have.status(200);", "});"]
+							}
+						}
+					]
+				},
+				{
+					"name": "2. Listar Tarjetas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{tarjetas_base_url}}/tarjetas",
+							"host": ["{{tarjetas_base_url}}"],
+							"path": ["tarjetas"]
+						},
+						"description": "Esperado 200 con la tarjeta creada. Captura 2 de pregunta1."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": ["pm.test(\"Listar tarjetas -> 200\", function () {", "    pm.response.to.have.status(200);", "});"]
+							}
+						}
+					]
+				},
+				{
+					"name": "3. Buscar Tarjeta por id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{tarjetas_base_url}}/tarjetas/1",
+							"host": ["{{tarjetas_base_url}}"],
+							"path": ["tarjetas", "1"]
+						},
+						"description": "Esperado 200. Es el endpoint que ms-recargas consume via OpenFeign. Captura 3 de pregunta1."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": ["pm.test(\"Buscar tarjeta -> 200\", function () {", "    pm.response.to.have.status(200);", "});"]
+							}
+						}
+					]
+				},
+				{
+					"name": "4. Registrar Recarga OK (valida Feign)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"idRecarga\": 10,\n  \"idTarjeta\": 1,\n  \"montoRecarga\": 100\n}"
+						},
+						"url": {
+							"raw": "{{recargas_base_url}}/recargas",
+							"host": ["{{recargas_base_url}}"],
+							"path": ["recargas"]
+						},
+						"description": "Esperado 201 con saldoDisponible copiado desde Tarjetas (1000) y fechaRecarga auto. Captura 4 de pregunta1."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": ["pm.test(\"Recarga OK -> 201\", function () {", "    pm.response.to.have.status(201);", "});"]
+							}
+						}
+					]
+				},
+				{
+					"name": "5. Registrar Recarga tarjeta inexistente",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"idRecarga\": 99,\n  \"idTarjeta\": 999,\n  \"montoRecarga\": 50\n}"
+						},
+						"url": {
+							"raw": "{{recargas_base_url}}/recargas",
+							"host": ["{{recargas_base_url}}"],
+							"path": ["recargas"]
+						},
+						"description": "Esperado 404 Tarjeta no existe (Fase 1). Captura 5 de pregunta1."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": ["pm.test(\"Recarga inexistente -> 404\", function () {", "    pm.response.to.have.status(404);", "});"]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "P2 - Asincrona (Recargas -> atuncar_queue -> Riesgo)",
+			"description": "Capturas para pregunta2_apellido.docx. Requiere RabbitMQ arriba y ms-riesgo corriendo.",
+			"item": [
+				{
+					"name": "6. Recarga caso Aprobada (monto <= 70% saldo)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"idRecarga\": 11,\n  \"idTarjeta\": 1,\n  \"montoRecarga\": 100\n}"
+						},
+						"url": {
+							"raw": "{{recargas_base_url}}/recargas",
+							"host": ["{{recargas_base_url}}"],
+							"path": ["recargas"]
+						},
+						"description": "Esperado 201. 100 <= 70% de 1000, riesgo la guarda como Aprobada. Captura 1 de pregunta2."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": ["pm.test(\"Caso Aprobada -> 201\", function () {", "    pm.response.to.have.status(201);", "});"]
+							}
+						}
+					]
+				},
+				{
+					"name": "7. Recarga caso Observada (monto > 70% saldo)",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"idRecarga\": 12,\n  \"idTarjeta\": 1,\n  \"montoRecarga\": 900\n}"
+						},
+						"url": {
+							"raw": "{{recargas_base_url}}/recargas",
+							"host": ["{{recargas_base_url}}"],
+							"path": ["recargas"]
+						},
+						"description": "Esperado 201. 900 > 70% de 1000, riesgo la guarda como Observada. Captura 2 de pregunta2."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": ["pm.test(\"Caso Observada -> 201\", function () {", "    pm.response.to.have.status(201);", "});"]
+							}
+						}
+					]
+				},
+				{
+					"name": "8. Listar Analisis (riesgo)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{riesgo_base_url}}/analisis",
+							"host": ["{{riesgo_base_url}}"],
+							"path": ["analisis"]
+						},
+						"description": "Esperado 200 con ambas filas (Aprobada y Observada). Captura final de pregunta2, junto a http://localhost:15672 (cola atuncar_queue) y logs del consumer."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": ["pm.test(\"Listar analisis -> 200\", function () {", "    pm.response.to.have.status(200);", "});"]
+							}
+						}
+					]
+				}
+			]
+		}
+	],
+	"variable": [
+		{ "key": "tarjetas_base_url", "value": "http://localhost:8081" },
+		{ "key": "recargas_base_url", "value": "http://localhost:8082" },
+		{ "key": "riesgo_base_url", "value": "http://localhost:8083" }
+	]
+}
