@@ -1,6 +1,8 @@
 package com.paygo.tarjetas.controller;
 import com.paygo.tarjetas.entity.Tarjeta;
 import com.paygo.tarjetas.service.TarjetaService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -13,8 +15,8 @@ public class TarjetaController {
     }
     @PostMapping
     public ResponseEntity<Tarjeta> registrar(
-            @RequestBody Tarjeta tarjeta) {
-        return ResponseEntity.ok(
+            @Valid @RequestBody Tarjeta tarjeta) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(
                 tarjetaService.registrar(tarjeta)
         );
     }

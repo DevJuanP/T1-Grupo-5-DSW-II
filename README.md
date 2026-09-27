@@ -9,27 +9,32 @@ Repositorio correspondiente a la evaluación T1 del Grupo 5 para el curso de Des
 | `ms-recargas` | 8082 | Registra recargas, valida tarjeta vía OpenFeign, publica en `atuncar_queue` | `paygo_recargas` |
 | `ms-riesgo` | 8083 | Consume `atuncar_queue`, guarda `analisis` (Aprobada/Observada), `GET /analisis` | `paygo_riesgo` |
 
-Infra: Kafka `9092` (KRaft, sin Zookeeper) + UI `http://localhost:8080`. Tópico del examen: `atuncar_queue` (cambiar al apellido real antes de entregar).
+Infra: MySQL `3306` (`paygo_tarjetas/recargas/riesgo`) + Kafka `9092` (KRaft, sin Zookeeper) + UI `http://localhost:8080` + RabbitMQ `5672` + consola `http://localhost:15672` (guest/guest). Cola/tópico del examen: `atuncar_queue` (cambiar al apellido real antes de entregar). Modo dual `both` por defecto (`app.messaging.mode=kafka|rabbit|both`).
 
 ## 🚀 Cómo levantar (en orden)
 
 ```bash
-# 1. Kafka
-cd infrastructure && docker compose -f docker-compose-kafka.yml up -d
+# 1. MySQL (desde su carpeta: el compose monta ../infrastructure/mysql-init)
+cd database && docker compose up -d && cd ..
 
-# 2. Microservicios (una terminal por servicio, en este orden)
+# 2. Kafka + RabbitMQ
+cd infrastructure && docker compose -f docker-compose-kafka.yml up -d
+docker compose -f docker-compose-rabbitmq.yml up -d && cd ..
+
+# 3. Microservicios (una terminal por servicio, en este orden)
 cd ms-tarjetas && ./mvnw spring-boot:run   # :8081 primero
 cd ms-recargas && ./mvnw spring-boot:run   # :8082
 cd ms-riesgo && ./mvnw spring-boot:run     # :8083
 ```
 
-También puedes levantar todo (MySQL + Kafka + los 3 microservicios) con un solo comando desde la raíz del repo: `docker compose up -d --build` (usa `database/docker-compose.yml`, no el de `infrastructure/`).
+También puedes levantar MySQL + Kafka + RabbitMQ con los comandos de arriba y correr los 3 microservicios con Docker (cada `ms-*/Dockerfile` expone su puerto). No hay `docker-compose.yml` en la raíz: no usar `docker compose up` desde la raíz.
 
 Verificación rápida:
 - Tarjetas: `GET http://localhost:8081/tarjetas`
 - Recargas: `GET http://localhost:8082/recargas`
 - Riesgo: `GET http://localhost:8083/analisis`
 - Kafka: `http://localhost:8080` → tópico `atuncar_queue` → pestaña Messages
+- RabbitMQ: `http://localhost:15672` (guest/guest) → cola `atuncar_queue` → Get Message(s)
 
 ## 🧪 Postman (evidencia P1 + P2)
 
@@ -43,4 +48,5 @@ Cada request indica el resultado esperado y a qué captura corresponde (`pregunt
 ## 📚 Documentación
 
 - [Guía Git para trabajar en equipo](docs/guia-git.md) — Reglas paso a paso para trabajar con ramas, PRs y mantener `main` siempre estable. Léela antes de empezar.
-- [Plan de implementación por fases](docs/plan-implementacion-fases.md) — Fases 0–6 con su correspondencia al repo guía `T1-DAW II`.
+- [Plan de implementación dual Kafka + Rabbit](docs/plan-implementacion-dual-both.md) — Fases 0–5, modo `both` por defecto.
+- [Plan original por fases (archivado)](docs/realizado/plan-implementacion-fases.md) — Decisión inicial solo-RabbitMQ, superada por el modo dual.
