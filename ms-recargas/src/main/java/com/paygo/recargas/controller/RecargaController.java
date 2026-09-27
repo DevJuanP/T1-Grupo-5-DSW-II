@@ -1,6 +1,7 @@
 package com.paygo.recargas.controller;
 import com.paygo.recargas.entity.Recarga;
 import com.paygo.recargas.service.RecargaService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -14,7 +15,7 @@ public class RecargaController {
     @PostMapping
     public ResponseEntity<Recarga> registrar(
             @RequestBody Recarga recarga) {
-        return ResponseEntity.ok(
+        return ResponseEntity.status(HttpStatus.CREATED).body(
                 recargaService.registrar(recarga)
         );
     }
