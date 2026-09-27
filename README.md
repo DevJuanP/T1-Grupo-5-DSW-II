@@ -11,6 +11,21 @@ Repositorio correspondiente a la evaluación T1 del Grupo 5 para el curso de Des
 
 Infra: MySQL `3307` por defecto (`DB_PORT`, `paygo_tarjetas/recargas/riesgo`, root/1234) + Kafka `9092` (KRaft, sin Zookeeper) + UI `http://localhost:8080` + RabbitMQ `5672` + consola `http://localhost:15672` (guest/guest). Cola/tópico del examen: `atuncar_queue` (cambiar al apellido real antes de entregar). Modo dual `both` por defecto (`app.messaging.mode=kafka|rabbit|both`).
 
+## 🔌 Puertos a levantar
+
+| Servicio / UI | Puerto host | Puerto contenedor | URL local | Compose / origen |
+|---|---|---|---|---|
+| `ms-tarjetas` | 8081 | 8081 (`EXPOSE 8081`) | `http://localhost:8081/tarjetas` | `ms-tarjetas/Dockerfile:11`, `application.properties:2` |
+| `ms-recargas` | 8082 | 8082 (`EXPOSE 8082`) | `http://localhost:8082/recargas` | `ms-recargas/Dockerfile`, `application.properties:2` |
+| `ms-riesgo` | 8083 | 8083 (`EXPOSE 8083`) | `http://localhost:8083/analisis` | `ms-riesgo/Dockerfile`, `application.properties:2` |
+| MySQL (`paygo-mysql`) | 3307 (`${DB_PORT:-3307}`) | 3306 | `jdbc:mysql://localhost:3307/paygo_*` | `database/docker-compose.yml:11` |
+| Kafka (`paygo-kafka`) | 9092 | 9092 | `localhost:9092` (Spring: `KAFKA_BOOT`) | `infrastructure/docker-compose-kafka.yml:15` |
+| Kafka-UI (`paygo-kafka-ui`) | 8080 | 8080 | `http://localhost:8080` → tópico `atuncar_queue` | `infrastructure/docker-compose-kafka.yml:41` |
+| RabbitMQ AMQP (`paygo-rabbitmq`) | 5672 | 5672 | `localhost:5672` (guest/guest) | `infrastructure/docker-compose-rabbitmq.yml:14` |
+| RabbitMQ consola | 15672 | 15672 | `http://localhost:15672` → cola `atuncar_queue` | `infrastructure/docker-compose-rabbitmq.yml:15` |
+
+> Orden de levantada: MySQL → Kafka + RabbitMQ → `ms-tarjetas :8081` → `ms-recargas :8082` → `ms-riesgo :8083`. Ver guía paso a paso con IntelliJ IDEA + Docker en [docs/guia-intellij-docker.md](docs/guia-intellij-docker.md).
+
 ## 🚀 Cómo levantar (en orden)
 
 ```bash
@@ -53,6 +68,7 @@ Cada request indica el resultado esperado y a qué captura corresponde. Evidenci
 
 ## 📚 Documentación
 
+- [Guía IntelliJ IDEA + Docker](docs/guia-intellij-docker.md) — Cómo abrir el proyecto en IntelliJ, levantar MySQL/Kafka/Rabbit con Docker y correr los 3 microservicios en orden para sacar las capturas P1+P2.
 - [Guía Git para trabajar en equipo](docs/guia-git.md) — Reglas paso a paso para trabajar con ramas, PRs y mantener `main` siempre estable. Léela antes de empezar.
 - [Plan de implementación dual Kafka + Rabbit](docs/plan-implementacion-dual-both.md) — Fases 0–5, modo `both` por defecto.
 - [Plan original por fases (archivado)](docs/realizado/plan-implementacion-fases.md) — Decisión inicial solo-RabbitMQ, superada por el modo dual.
