@@ -1,14 +1,11 @@
 services:
 
   # ============================================================
-  # 🐇 RABBITMQ — PAYGO PERÚ (Fase 0)
-  # Copia literal de T1-DAW II/queue/docker-compose-rabbitmq.yml
-  # Puerto 5672  → Spring Boot se conecta aquí (AMQP)
+  # 🐇 RABBITMQ
+  # Puerto 5672  → tu Spring Boot se conecta aquí (AMQP)
   # Puerto 15672 → Management Console (browser)
   #                http://localhost:15672
   #                usuario: guest / contraseña: guest
-  # Cola del examen: atuncar_queue (se declara por código
-  # en ms-recargas y ms-riesgo, no aquí)
   # ============================================================
   rabbitmq:
     image: rabbitmq:3-management

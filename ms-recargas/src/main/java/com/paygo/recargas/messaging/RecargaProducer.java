@@ -1,31 +1,26 @@
 package com.paygo.recargas.messaging;
 
-import com.paygo.recargas.config.RabbitMQConfig;
+import com.paygo.recargas.config.KafkaTopicConfig;
 import com.paygo.recargas.dto.RecargaMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
-// Espejo de T1-DAW II/backend/sales-services/.../rabbitmq/StockReserveProducer.java
 @Component
 public class RecargaProducer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RecargaProducer.class);
 
-    private final RabbitTemplate rabbitTemplate;
+    private final KafkaTemplate<String, RecargaMessage> kafkaTemplate;
 
-    public RecargaProducer(RabbitTemplate rabbitTemplate) {
-        this.rabbitTemplate = rabbitTemplate;
+    public RecargaProducer(KafkaTemplate<String, RecargaMessage> kafkaTemplate) {
+        this.kafkaTemplate = kafkaTemplate;
     }
 
     public void publish(RecargaMessage event) {
-        rabbitTemplate.convertAndSend(
-                RabbitMQConfig.PAYGO_EXCHANGE,
-                RabbitMQConfig.ATUNCAR_ROUTING_KEY,
-                event
-        );
-        LOGGER.info("Evento RabbitMQ publicado. exchange={}, routingKey={}, payload={}",
-                RabbitMQConfig.PAYGO_EXCHANGE, RabbitMQConfig.ATUNCAR_ROUTING_KEY, event);
+        kafkaTemplate.send(KafkaTopicConfig.ATUNCAR_TOPIC, event.idRecarga().toString(), event);
+        LOGGER.info("Evento Kafka publicado. topic={}, key={}, payload={}",
+                KafkaTopicConfig.ATUNCAR_TOPIC, event.idRecarga(), event);
     }
 }

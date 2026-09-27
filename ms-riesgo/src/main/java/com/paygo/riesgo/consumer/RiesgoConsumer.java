@@ -1,15 +1,13 @@
 package com.paygo.riesgo.consumer;
 
-import com.paygo.riesgo.config.RabbitMQConfig;
+import com.paygo.riesgo.config.KafkaTopicConfig;
 import com.paygo.riesgo.dto.RecargaMessage;
 import com.paygo.riesgo.service.AnalisisService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
-// Espejo de T1-DAW II/backend/products-services/.../rabbitmq/StockReserveConsumer.java
-// (@Component + @RabbitListener + delegación al @Service + log).
 @Component
 public class RiesgoConsumer {
 
@@ -21,7 +19,7 @@ public class RiesgoConsumer {
         this.analisisService = analisisService;
     }
 
-    @RabbitListener(queues = RabbitMQConfig.ATUNCAR_QUEUE)
+    @KafkaListener(topics = KafkaTopicConfig.ATUNCAR_TOPIC)
     public void onRecarga(RecargaMessage message) {
         var guardado = analisisService.registrar(message);
         LOGGER.info("[ms-riesgo] Recarga evaluada. idRecarga={}, idTarjeta={}, situacion={}",
