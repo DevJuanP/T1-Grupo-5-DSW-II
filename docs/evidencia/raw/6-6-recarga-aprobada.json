@@ -1,0 +1,21 @@
+{
+  "label": "6-recarga-aprobada",
+  "method": "POST",
+  "url": "http://localhost:8082/recargas",
+  "body": {
+    "idRecarga": 11,
+    "idTarjeta": 1,
+    "montoRecarga": 100
+  },
+  "expect": 201,
+  "status": 201,
+  "ms": 46,
+  "response": {
+    "idRecarga": 11,
+    "idTarjeta": 1,
+    "saldoDisponible": 1000,
+    "montoRecarga": 100,
+    "fechaRecarga": "2026-09-27T00:39:26.5282395"
+  },
+  "pass": true
+}

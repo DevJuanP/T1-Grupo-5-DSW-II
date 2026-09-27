@@ -1,0 +1,21 @@
+{
+  "label": "9-recarga-13-dual",
+  "method": "POST",
+  "url": "http://localhost:8082/recargas",
+  "body": {
+    "idRecarga": 13,
+    "idTarjeta": 1,
+    "montoRecarga": 200
+  },
+  "expect": 201,
+  "status": 201,
+  "response": {
+    "idRecarga": 13,
+    "idTarjeta": 1,
+    "saldoDisponible": 1000,
+    "montoRecarga": 200,
+    "fechaRecarga": "2026-09-27T00:47:04.614151",
+    "situacion": "Aprobada"
+  },
+  "note": "Ambos consumers (Kafka RiesgoConsumer y Rabbit RiesgoRabbitConsumer) registraron evaluada idRecarga=13 sin duplicados"
+}

@@ -1,0 +1,21 @@
+{
+  "label": "1-crear-tarjeta",
+  "method": "POST",
+  "url": "http://localhost:8081/tarjetas",
+  "body": {
+    "idTarjeta": 1,
+    "nomTitular": "Juan Perez",
+    "saldoAsignado": 1000,
+    "saldoDisponible": 1000
+  },
+  "expect": 201,
+  "status": 201,
+  "ms": 710,
+  "response": {
+    "idTarjeta": 1,
+    "nomTitular": "Juan Perez",
+    "saldoAsignado": 1000,
+    "saldoDisponible": 1000
+  },
+  "pass": true
+}

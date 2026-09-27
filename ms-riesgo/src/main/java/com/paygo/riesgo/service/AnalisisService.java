@@ -26,9 +26,12 @@ public class AnalisisService {
     // Idempotente por idRecarga: el modo dual (Kafka + Rabbit) entrega el mismo
     // evento dos veces. Sin este guard, la segunda insercion fallaria por PK
     // duplicada. Se conserva la regla del examen: Aprobada <= 70%, Observada > 70%.
+    // OJO: se usa findById (entidad inicializada), NO getReferenceById (proxy
+    // lazy que revienta con LazyInitializationException en el log del consumer).
     public Analisis evaluar(RecargaMessage message) {
-        if (analisisRepository.existsById(message.idRecarga())) {
-            return analisisRepository.getReferenceById(message.idRecarga());
+        var existente = analisisRepository.findById(message.idRecarga());
+        if (existente.isPresent()) {
+            return existente.get();
         }
         String situacion = message.montoRecarga() <= 0.7 * message.saldoDisponible()
                 ? "Aprobada"
@@ -44,7 +47,7 @@ public class AnalisisService {
             ));
         } catch (DataIntegrityViolationException e) {
             // Carrera Kafka vs Rabbit: el otro consumer inserto primero.
-            return analisisRepository.getReferenceById(message.idRecarga());
+            return analisisRepository.findById(message.idRecarga()).orElseThrow(() -> e);
         }
     }
 

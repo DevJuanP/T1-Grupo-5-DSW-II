@@ -9,19 +9,25 @@ Repositorio correspondiente a la evaluación T1 del Grupo 5 para el curso de Des
 | `ms-recargas` | 8082 | Registra recargas, valida tarjeta vía OpenFeign, publica en `atuncar_queue` | `paygo_recargas` |
 | `ms-riesgo` | 8083 | Consume `atuncar_queue`, guarda `analisis` (Aprobada/Observada), `GET /analisis` | `paygo_riesgo` |
 
-Infra: MySQL `3306` (`paygo_tarjetas/recargas/riesgo`) + Kafka `9092` (KRaft, sin Zookeeper) + UI `http://localhost:8080` + RabbitMQ `5672` + consola `http://localhost:15672` (guest/guest). Cola/tópico del examen: `atuncar_queue` (cambiar al apellido real antes de entregar). Modo dual `both` por defecto (`app.messaging.mode=kafka|rabbit|both`).
+Infra: MySQL `3307` por defecto (`DB_PORT`, `paygo_tarjetas/recargas/riesgo`, root/1234) + Kafka `9092` (KRaft, sin Zookeeper) + UI `http://localhost:8080` + RabbitMQ `5672` + consola `http://localhost:15672` (guest/guest). Cola/tópico del examen: `atuncar_queue` (cambiar al apellido real antes de entregar). Modo dual `both` por defecto (`app.messaging.mode=kafka|rabbit|both`).
 
 ## 🚀 Cómo levantar (en orden)
 
 ```bash
 # 1. MySQL (desde su carpeta: el compose monta ../infrastructure/mysql-init)
+# Puerto host parametrizado como en la guía T1-DAW II: default 3307 para no
+# chocar con un MySQL local en 3306. Si tu 3306 está libre usa DB_PORT=3306.
 cd database && docker compose up -d && cd ..
+# Verificar: docker ps → paygo-mysql healthy; BDs paygo_* creadas por init.sql
 
 # 2. Kafka + RabbitMQ
 cd infrastructure && docker compose -f docker-compose-kafka.yml up -d
 docker compose -f docker-compose-rabbitmq.yml up -d && cd ..
 
 # 3. Microservicios (una terminal por servicio, en este orden)
+# Con MySQL en 3307 (default del compose) exporta DB_URL antes de cada uno:
+#   export DB_URL=jdbc:mysql://localhost:3307/paygo_tarjetas  # (o recargas/riesgo)
+# Con MySQL en 3306 (DB_PORT=3306 o MySQL local con root/1234) no necesitas nada.
 cd ms-tarjetas && ./mvnw spring-boot:run   # :8081 primero
 cd ms-recargas && ./mvnw spring-boot:run   # :8082
 cd ms-riesgo && ./mvnw spring-boot:run     # :8083
@@ -43,7 +49,7 @@ Importar en Postman la colección + environment y seleccionar el environment arr
 - `docs/postman/PAYGO-T1.postman_collection.json` — carpetas `P1 - Sincronica` (5 requests) y `P2 - Asincrona` (3 requests), en orden de capturas.
 - `docs/postman/PAYGO-Local.postman_environment.json` — `tarjetas/recargas/riesgo_base_url` a `localhost:8081/8082/8083`.
 
-Cada request indica el resultado esperado y a qué captura corresponde (`pregunta1_apellido.docx` / `pregunta2_apellido.docx`, que se arman manual con las capturas: Postman + Kafka UI (`http://localhost:8080`) + logs del consumer).
+Cada request indica el resultado esperado y a qué captura corresponde. Evidencia ejecutada el 2026-09-27 (8/8 PASS) en `docs/evidencia/`: `pregunta1_atuncar.docx` (P1) y `pregunta2_atuncar.docx` (P2, con capturas Kafka-UI + RabbitMQ + logs), respuestas crudas en `raw/*.json`, reproducibles con `node docs/evidencia/run-e2e.js` y `node docs/evidencia/build-docx.js`. Renombrar `atuncar` al apellido del entregante antes de subir a BlackBoard.
 
 ## 📚 Documentación
 

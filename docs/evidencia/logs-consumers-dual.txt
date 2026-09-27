@@ -1,0 +1,5 @@
+c.p.r.consumer.RiesgoRabbitConsumer      : [ms-riesgo-rabbit] Recarga evaluada. idRecarga=10, idTarjeta=1, situacion=Aprobada
+c.p.r.consumer.RiesgoRabbitConsumer      : [ms-riesgo-rabbit] Recarga evaluada. idRecarga=11, idTarjeta=1, situacion=Aprobada
+c.p.r.consumer.RiesgoRabbitConsumer      : [ms-riesgo-rabbit] Recarga evaluada. idRecarga=12, idTarjeta=1, situacion=Observada
+c.paygo.riesgo.consumer.RiesgoConsumer   : [ms-riesgo] Recarga evaluada. idRecarga=13, idTarjeta=1, situacion=Aprobada
+c.p.r.consumer.RiesgoRabbitConsumer      : [ms-riesgo-rabbit] Recarga evaluada. idRecarga=13, idTarjeta=1, situacion=Aprobada
