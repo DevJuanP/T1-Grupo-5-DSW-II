@@ -21,7 +21,7 @@ public class RiesgoConsumer {
 
     @KafkaListener(topics = KafkaTopicConfig.ATUNCAR_TOPIC)
     public void onRecarga(RecargaMessage message) {
-        var guardado = analisisService.registrar(message);
+        var guardado = analisisService.evaluar(message);
         LOGGER.info("[ms-riesgo] Recarga evaluada. idRecarga={}, idTarjeta={}, situacion={}",
                 guardado.getIdRecarga(), guardado.getIdTarjeta(), guardado.getSituacion());
     }

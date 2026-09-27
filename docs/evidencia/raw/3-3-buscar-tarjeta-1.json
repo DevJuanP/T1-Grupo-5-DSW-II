@@ -1,0 +1,16 @@
+{
+  "label": "3-buscar-tarjeta-1",
+  "method": "GET",
+  "url": "http://localhost:8081/tarjetas/1",
+  "body": null,
+  "expect": 200,
+  "status": 200,
+  "ms": 21,
+  "response": {
+    "idTarjeta": 1,
+    "nomTitular": "Juan Perez",
+    "saldoAsignado": 1000,
+    "saldoDisponible": 1000
+  },
+  "pass": true
+}

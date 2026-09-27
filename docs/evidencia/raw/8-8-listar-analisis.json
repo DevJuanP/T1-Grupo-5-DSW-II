@@ -1,0 +1,36 @@
+{
+  "label": "8-listar-analisis",
+  "method": "GET",
+  "url": "http://localhost:8083/analisis",
+  "body": null,
+  "expect": 200,
+  "status": 200,
+  "ms": 55,
+  "response": [
+    {
+      "idRecarga": 10,
+      "idTarjeta": 1,
+      "saldoDisponible": 1000,
+      "montoRecarga": 100,
+      "fechaRecarga": "2026-09-27T00:39:25.499511",
+      "situacion": "Aprobada"
+    },
+    {
+      "idRecarga": 11,
+      "idTarjeta": 1,
+      "saldoDisponible": 1000,
+      "montoRecarga": 100,
+      "fechaRecarga": "2026-09-27T00:39:26.52824",
+      "situacion": "Aprobada"
+    },
+    {
+      "idRecarga": 12,
+      "idTarjeta": 1,
+      "saldoDisponible": 1000,
+      "montoRecarga": 900,
+      "fechaRecarga": "2026-09-27T00:39:26.577935",
+      "situacion": "Observada"
+    }
+  ],
+  "pass": true
+}

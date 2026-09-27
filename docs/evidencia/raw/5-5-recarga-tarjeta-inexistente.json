@@ -1,0 +1,20 @@
+{
+  "label": "5-recarga-tarjeta-inexistente",
+  "method": "POST",
+  "url": "http://localhost:8082/recargas",
+  "body": {
+    "idRecarga": 99,
+    "idTarjeta": 999,
+    "montoRecarga": 50
+  },
+  "expect": 404,
+  "status": 404,
+  "ms": 44,
+  "response": {
+    "timestamp": "2026-09-27T05:39:26.501Z",
+    "status": 404,
+    "error": "Not Found",
+    "path": "/recargas"
+  },
+  "pass": true
+}

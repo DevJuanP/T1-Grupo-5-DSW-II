@@ -1,0 +1,18 @@
+{
+  "label": "2-listar-tarjetas",
+  "method": "GET",
+  "url": "http://localhost:8081/tarjetas",
+  "body": null,
+  "expect": 200,
+  "status": 200,
+  "ms": 17,
+  "response": [
+    {
+      "idTarjeta": 1,
+      "nomTitular": "Juan Perez",
+      "saldoAsignado": 1000,
+      "saldoDisponible": 1000
+    }
+  ],
+  "pass": true
+}

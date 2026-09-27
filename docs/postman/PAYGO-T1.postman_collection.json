@@ -1,7 +1,7 @@
 {
 	"info": {
 		"name": "PAYGO T1 - Recargas y Riesgo",
-		"description": "Colección de evidencia T1 Grupo 5 (PAYGO PERÚ). Orden de ejecución = orden de capturas para pregunta1/pregunta2. Importar junto al environment PAYGO-Local.",
+		"description": "Colección de evidencia T1 Grupo 5 (PAYGO PERÚ). Orden de ejecución = orden de capturas para pregunta1/pregunta2. Importar junto al environment PAYGO-Local. Modo dual both por defecto (app.messaging.mode=both): cada recarga se publica en Kafka y RabbitMQ; el consumo es idempotente por idRecarga.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -23,13 +23,13 @@
 							"host": ["{{tarjetas_base_url}}"],
 							"path": ["tarjetas"]
 						},
-						"description": "Esperado 200. Captura 1 de pregunta1."
+						"description": "Esperado 201. Captura 1 de pregunta1."
 					},
 					"event": [
 						{
 							"listen": "test",
 							"script": {
-								"exec": ["pm.test(\"Crear tarjeta -> 200\", function () {", "    pm.response.to.have.status(200);", "});"]
+								"exec": ["pm.test(\"Crear tarjeta -> 201\", function () {", "    pm.response.to.have.status(201);", "});"]
 							}
 						}
 					]
@@ -115,7 +115,7 @@
 							"host": ["{{recargas_base_url}}"],
 							"path": ["recargas"]
 						},
-						"description": "Esperado 404 Tarjeta no existe (Fase 1). Captura 5 de pregunta1."
+						"description": "Esperado 404 Tarjeta no existe (validación Feign). Captura 5 de pregunta1."
 					},
 					"event": [
 						{
@@ -130,7 +130,7 @@
 		},
 		{
 			"name": "P2 - Asincrona (Recargas -> atuncar_queue -> Riesgo)",
-			"description": "Capturas para pregunta2_apellido.docx. Requiere RabbitMQ arriba y ms-riesgo corriendo.",
+			"description": "Capturas para pregunta2_apellido.docx. Requiere MySQL + Kafka + RabbitMQ arriba y ms-riesgo corriendo (modo both por defecto). Verificar el mensaje en Kafka-UI http://localhost:8080 (tópico atuncar_queue → Messages) y en RabbitMQ http://localhost:15672 guest/guest (cola atuncar_queue → Get Message(s)). Solo-Rabbit: parar Kafka, mode=rabbit, POST, ver Ready=1, levantar riesgo, Ready vuelve a 0 (truco de T1-DAW II/backend/flujos-kafka-rabbit.md §3). Solo-Kafka: inverso con mode=kafka y Kafka-UI.",
 			"item": [
 				{
 					"name": "6. Recarga caso Aprobada (monto <= 70% saldo)",
@@ -192,7 +192,7 @@
 							"host": ["{{riesgo_base_url}}"],
 							"path": ["analisis"]
 						},
-						"description": "Esperado 200 con ambas filas (Aprobada y Observada). Captura final de pregunta2, junto a http://localhost:15672 (cola atuncar_queue) y logs del consumer."
+						"description": "Esperado 200 con las filas Aprobada y Observada (una sola vez por idRecarga aunque lleguen por Kafka y Rabbit: consumo idempotente). Captura final de pregunta2, junto a http://localhost:8080 (tópico atuncar_queue → Messages), http://localhost:15672 (cola atuncar_queue → Get Message(s)) y logs de ambos consumers ([ms-riesgo] y [ms-riesgo-rabbit])."
 					},
 					"event": [
 						{

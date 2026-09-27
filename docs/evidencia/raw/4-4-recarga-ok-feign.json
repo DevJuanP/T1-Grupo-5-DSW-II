@@ -1,0 +1,21 @@
+{
+  "label": "4-recarga-ok-feign",
+  "method": "POST",
+  "url": "http://localhost:8082/recargas",
+  "body": {
+    "idRecarga": 10,
+    "idTarjeta": 1,
+    "montoRecarga": 100
+  },
+  "expect": 201,
+  "status": 201,
+  "ms": 1138,
+  "response": {
+    "idRecarga": 10,
+    "idTarjeta": 1,
+    "saldoDisponible": 1000,
+    "montoRecarga": 100,
+    "fechaRecarga": "2026-09-27T00:39:25.4995108"
+  },
+  "pass": true
+}
