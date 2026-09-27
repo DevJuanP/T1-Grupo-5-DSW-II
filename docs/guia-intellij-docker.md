@@ -100,6 +100,7 @@ Colección Postman lista: `docs/postman/PAYGO-T1.postman_collection.json` + `doc
 
 | Síntoma | Causa | Fix |
 |---|---|---|
+| `No se encuentra la ruta ...\ms-tarjetas\ms-tarjetas porque no existe` al hacer `cd ms-tarjetas` | Ya estás dentro de `ms-tarjetas` (hiciste `cd` dos veces) | Vuelve a la raíz primero: `cd ..` o `cd "D:\Cibertec\6to ciclo\DAW II\T1\T1-Grupo-5-DSW-II"`, verifica con `pwd` + `ls` (debes ver `ms-tarjetas/`, `ms-recargas/`, `database/`), y recién ahí `cd ms-tarjetas` |
 | `Communications link failure` / `Unknown database` | Apuntas a `3306` pero el compose expone `3307` | Pon `DB_URL=jdbc:mysql://localhost:3307/paygo_*` en la Run Config |
 | `Port already in use 8080/8081/9092...` | Otro proceso o contenedor viejo | `docker ps`, `docker compose down` del compose viejo, o cierra la app que ocupa el puerto |
 | `Servicio de tarjetas no disponible` (503) | `ms-tarjetas :8081` apagado o `TARJETAS_URL` mal | Levanta `ms-tarjetas` primero, verifica `GET :8081/tarjetas/1` |
